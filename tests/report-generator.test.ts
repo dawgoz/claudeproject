@@ -60,4 +60,17 @@ describe('ReportGenerator', () => {
     expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
     expect(html).not.toContain('<script>alert(1)</script>');
   });
+
+  it('does not render non-HTTPS repository URLs as links', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'devflow-reports-'));
+    outputDirectories.push(directory);
+    const unsafeReport = {
+      ...report,
+      repository: { ...report.repository, url: 'javascript:alert(1)' },
+    };
+    const files = await new ReportGenerator().generate(unsafeReport, directory);
+    const html = await readFile(files[2]!, 'utf8');
+    expect(html).not.toContain('href="javascript:');
+    expect(html).toContain('Pull request link unavailable');
+  });
 });
