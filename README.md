@@ -25,7 +25,7 @@ Set `ANTHROPIC_API_KEY` and `GITHUB_PERSONAL_ACCESS_TOKEN` in `.env`. `CLAUDE_MO
 npm run dev -- --owner dawgoz --repo claudeproject --pr-number 1
 ```
 
-The command writes one `.json`, `.md`, and `.html` report for that pull request under `reports/`. Replace the PR number with the actual GitHub pull request number. After building, use `npm start -- --owner ... --repo ... --pr-number ...`.
+The command writes one `.json`, `.md`, and `.html` report for that pull request under `reports/`. Replace the PR number with the actual GitHub pull request number. Use `--output-dir <path>` to choose a different directory for one run; it takes precedence over `REPORTS_DIR`. After building, use `npm start -- --owner ... --repo ... --pr-number ...`.
 
 To generate all nine requested deliverables for PRs #1, #2, and #3:
 

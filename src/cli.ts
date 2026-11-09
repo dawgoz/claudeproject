@@ -7,6 +7,7 @@ export interface CliArguments {
   owner: string;
   repo: string;
   prNumber: number;
+  outputDirectory?: string;
 }
 
 export function parseArguments(args: string[]): CliArguments {
@@ -20,7 +21,7 @@ export function parseArguments(args: string[]): CliArguments {
     if (!value || value.startsWith('--')) {
       throw new ReviewError(ErrorCodes.INVALID_ARGUMENT, `Missing value for ${key}.`);
     }
-    if (!['--owner', '--repo', '--pr-number'].includes(key)) {
+    if (!['--owner', '--repo', '--pr-number', '--output-dir'].includes(key)) {
       throw new ReviewError(ErrorCodes.INVALID_ARGUMENT, `Unknown option: ${key}`);
     }
     if (values.has(key)) {
@@ -36,7 +37,7 @@ export function parseArguments(args: string[]): CliArguments {
   if (!owner || !repo || !prValue) {
     throw new ReviewError(
       ErrorCodes.INVALID_ARGUMENT,
-      'Usage: npm run dev -- --owner <owner> --repo <repo> --pr-number <number>',
+      'Usage: npm run dev -- --owner <owner> --repo <repo> --pr-number <number> [--output-dir <path>]',
     );
   }
   if (!/^[\w.-]+$/.test(owner) || !/^[\w.-]+$/.test(repo)) {
@@ -46,7 +47,8 @@ export function parseArguments(args: string[]): CliArguments {
   if (!Number.isSafeInteger(prNumber) || prNumber < 1) {
     throw new ReviewError(ErrorCodes.INVALID_ARGUMENT, '--pr-number must be a positive integer.');
   }
-  return { owner, repo, prNumber };
+  const outputDirectory = values.get('--output-dir');
+  return { owner, repo, prNumber, ...(outputDirectory ? { outputDirectory } : {}) };
 }
 
 export function validateEnvironment(env: NodeJS.ProcessEnv = process.env): void {
@@ -65,7 +67,7 @@ export async function runCli(args: string[], env: NodeJS.ProcessEnv = process.en
     { owner: target.owner, repo: target.repo, number: target.prNumber },
     env,
   );
-  const outputDirectory = resolve(env.REPORTS_DIR ?? 'reports');
+  const outputDirectory = resolve(target.outputDirectory ?? env.REPORTS_DIR ?? 'reports');
   const files = await new ReportGenerator().generate(report, outputDirectory);
   return files;
 }
