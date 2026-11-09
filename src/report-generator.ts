@@ -14,6 +14,15 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#39;');
 }
 
+function safeHttpsUrl(value: string): string | undefined {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' ? escapeHtml(url.href) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function renderMarkdown(report: ReviewReport): string {
   const findings = report.findings.length
     ? report.findings
@@ -60,6 +69,7 @@ function renderHtml(report: ReviewReport): string {
   const recommendations = report.recommendations.length
     ? `<ul>${report.recommendations.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`
     : '<p>No additional recommendations.</p>';
+  const pullRequestUrl = safeHttpsUrl(report.repository.url);
 
   return `<!doctype html>
 <html lang="en">
@@ -83,7 +93,7 @@ function renderHtml(report: ReviewReport): string {
 <body><main>
   <h1>Pull Request Review</h1>
   <p><strong>${escapeHtml(report.repository.owner)}/${escapeHtml(report.repository.name)} #${report.repository.pullRequest}: ${escapeHtml(report.repository.title)}</strong></p>
-  <p class="meta"><a href="${escapeHtml(report.repository.url)}">Open pull request</a> · ${escapeHtml(report.generatedAt)} · ${escapeHtml(report.repository.state)} · ${escapeHtml(report.repository.headSha)}</p>
+  <p class="meta">${pullRequestUrl ? `<a href="${pullRequestUrl}">Open pull request</a>` : 'Pull request link unavailable'} · ${escapeHtml(report.generatedAt)} · ${escapeHtml(report.repository.state)} · ${escapeHtml(report.repository.headSha)}</p>
   <p class="score">Overall score: ${report.overallScore}/100</p>
   <h2>Summary</h2><p>${markdownSafe(report.summary)}</p>
   <h2>Findings</h2>${findings}
