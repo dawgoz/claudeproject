@@ -10,6 +10,17 @@ describe('CLI input validation', () => {
     });
   });
 
+  it('accepts a per-run report output directory', () => {
+    expect(parseArguments([
+      '--owner', 'dawgoz', '--repo', 'sample-repo', '--pr-number', '17', '--output-dir', '.\\review-output',
+    ])).toEqual({
+      owner: 'dawgoz',
+      repo: 'sample-repo',
+      prNumber: 17,
+      outputDirectory: '.\\review-output',
+    });
+  });
+
   it('rejects missing, duplicate, malformed, and unknown arguments', () => {
     expect(() => parseArguments([])).toThrow('Usage:');
     expect(() => parseArguments(['--owner', 'dawgoz', '--owner', 'other', '--repo', 'sample', '--pr-number', '1'])).toThrow('Duplicate');
