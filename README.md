@@ -14,10 +14,16 @@ The hosted GitHub MCP server is configured with repository and pull-request tool
 
 ```powershell
 npm install
-Copy-Item .env.example .env
 ```
 
-Set `ANTHROPIC_API_KEY` and `GITHUB_PERSONAL_ACCESS_TOKEN` in `.env`. `CLAUDE_MODEL` defaults to `claude-sonnet-4-5`; `REPORTS_DIR` defaults to `reports`.
+Create a `.env` file in the project root with your credentials:
+
+```dotenv
+ANTHROPIC_API_KEY=your-anthropic-api-key
+GITHUB_PERSONAL_ACCESS_TOKEN=your-read-only-github-token
+```
+
+The GitHub token can also be supplied as `GITHUB_TOKEN`. `ANTHROPIC_MODEL` selects the model; `CLAUDE_MODEL` remains a supported fallback. If neither is set, the model defaults to `claude-sonnet-4-5`. `REPORTS_DIR` defaults to `reports`.
 
 ## Use
 

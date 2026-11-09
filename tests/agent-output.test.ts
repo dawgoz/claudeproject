@@ -51,6 +51,15 @@ describe('parseAgentReport', () => {
     expect(parseAgentReport(JSON.stringify(validReport))).toEqual(validReport);
   });
 
+  it('rejects invalid structured output with a report validation error', () => {
+    expect(() => parseAgentReport('', { ...validReport, overallScore: 101 })).toThrowError(
+      expect.objectContaining({
+        code: ErrorCodes.INVALID_REPORT,
+        message: 'Claude returned a report that does not match the required review schema.',
+      }),
+    );
+  });
+
   it('identifies provider authentication failures without exposing response text', () => {
     expect(() => parseAgentReport('Invalid API key')).toThrowError(
       expect.objectContaining({

@@ -20,7 +20,7 @@ export function providerFailure(
     account_on_hold: 'The provider account is on hold.',
     verification_required: 'The provider account requires verification.',
     oauth_org_not_allowed: 'The provider account is not permitted to use this organization.',
-    model_not_found: 'Check that CLAUDE_MODEL is available through the configured provider.',
+    model_not_found: 'Check that ANTHROPIC_MODEL or CLAUDE_MODEL is available through the configured provider.',
     invalid_request: 'The provider rejected the request. Check provider compatibility with the Claude Agent SDK.',
     overloaded: 'The provider is overloaded. Retry later.',
     server_error: 'The provider encountered a server error. Retry later.',
@@ -36,7 +36,7 @@ export function providerFailure(
 
 export function parseAgentReport(result: string, structuredOutput?: unknown): ReviewReport {
   if (structuredOutput !== undefined) {
-    return ReviewReportSchema.parse(structuredOutput);
+    return validateReport(structuredOutput);
   }
 
   let parsed: unknown;
@@ -76,5 +76,16 @@ export function parseAgentReport(result: string, structuredOutput?: unknown): Re
     );
   }
 
-  return ReviewReportSchema.parse(parsed);
+  return validateReport(parsed);
+}
+
+function validateReport(value: unknown): ReviewReport {
+  const validation = ReviewReportSchema.safeParse(value);
+  if (!validation.success) {
+    throw new ReviewError(
+      ErrorCodes.INVALID_REPORT,
+      'Claude returned a report that does not match the required review schema.',
+    );
+  }
+  return validation.data;
 }
