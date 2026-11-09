@@ -30,15 +30,15 @@ export async function reviewPullRequest(
     for await (const message of query({
       prompt,
       options: {
-        model: env.CLAUDE_MODEL ?? 'claude-sonnet-4-5',
+        model: env.ANTHROPIC_MODEL ?? env.CLAUDE_MODEL ?? 'claude-sonnet-4-5',
         env: sdkEnv,
         cwd: process.cwd(),
         settingSources: ['project'],
-        tools: ['Agent', 'Read', 'Grep', 'Glob'],
+        tools: ['Task', 'Read', 'Grep', 'Glob'],
         agents: reviewAgents,
         mcpServers: createMcpServers(env),
         allowedTools: [
-          'Agent',
+          'Task',
           'mcp__github__pull_request_read',
           'mcp__github__get_file_contents',
           'mcp__eslint__lint-files',
